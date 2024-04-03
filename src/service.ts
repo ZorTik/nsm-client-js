@@ -1,5 +1,5 @@
 import NSMAbstractClient from "./client";
-import {BasicActionResponse} from "./models";
+import {BasicActionResponse, PowerStatusResponse, ServiceInspectResponse} from "./models";
 
 export class Service {
 
@@ -19,6 +19,10 @@ export class Service {
                 })
                 .catch(() => resolve(false));
         });
+    }
+
+    async inspect(): Promise<ServiceInspectResponse> {
+        return this.client.req("/v1/service/" + this.id, this.id);
     }
 
     async resume(): Promise<BasicActionResponse> {
@@ -43,6 +47,10 @@ export class Service {
         return this.client.req("/v1/service/" + this.id + "/reboot", this.id, {
             method: "POST",
         });
+    }
+
+    async powerStatus(): Promise<PowerStatusResponse> {
+        return this.client.req("/v1/service/" + this.id + "/powerstatus", this.id);
     }
 
 }

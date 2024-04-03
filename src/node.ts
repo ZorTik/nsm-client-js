@@ -2,11 +2,23 @@ import NSMAbstractClient from "./client";
 import {NodeStatusResponse} from "./models";
 
 export class NSMNode extends NSMAbstractClient {
+    private nodeId: string;
 
     constructor(
         readonly baseUrl: string|undefined,
     ) {
         super();
+    }
+
+    async update(): Promise<boolean> {
+        this.requireExists();
+        const status = await this.status();
+        if (status.nodeId) {
+            this.nodeId = status.nodeId;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     async exists(): Promise<boolean> {
@@ -20,6 +32,10 @@ export class NSMNode extends NSMAbstractClient {
 
     async getBaseUrl(serviceId?: string): Promise<string> {
         return this.baseUrl;
+    }
+
+    id() {
+        return this.nodeId;
     }
 
     private requireExists() {

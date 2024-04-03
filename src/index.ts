@@ -9,6 +9,12 @@ export type NSMInitOptions = {
     dbString?: string,
 }
 
+export function createNsm(options: NSMInitOptions) {
+    return new NSM(options);
+}
+
+// TODO: Tests for multiple NSMCluster baseUrls
+
 export default class NSM extends NSMAbstractClient {
     private readonly cluster: NSMCluster;
 
@@ -17,8 +23,16 @@ export default class NSM extends NSMAbstractClient {
         this.cluster = new NSMCluster(options.baseUrls, options.dbString);
     }
 
+    async forceFetchNodes() {
+        return this.cluster.mapNodes();
+    }
+
     getNode(id: string): NSMNode {
         return this.cluster.getNode(id);
+    }
+
+    getNodes(): NSMNode[] {
+        return this.cluster.getNodes();
     }
 
     getBaseUrl(serviceId?: string): Promise<string> {

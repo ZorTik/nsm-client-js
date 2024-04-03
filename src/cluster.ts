@@ -72,6 +72,10 @@ export default class NSMCluster {
         return this.nodes[id] || noneNsmNode;
     }
 
+    getNodes(): NSMNode[] {
+        return Object.values(this.nodes);
+    }
+
     private async firstBaseOrGet(get: () => Promise<string>) {
         const keys = Object.keys(this.nodes);
         if (keys.length === 0) {
@@ -106,16 +110,15 @@ export default class NSMCluster {
         });
     }
 
-    private async mapNodes() {
+    async mapNodes() {
         for (const baseUrl of this.baseUrls) {
             if (this.fetched.includes(baseUrl)) {
                 continue;
             }
             try {
                 const node = new NSMNode(baseUrl);
-                const status = await node.status();
-                if (status.nodeId) {
-                    this.nodes[status.nodeId] = node;
+                if (await node.update()) {
+                    this.nodes[node.id()] = node;
                     this.fetched.push(baseUrl);
                 }
             } catch (e) {

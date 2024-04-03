@@ -32,3 +32,27 @@ export type CreateServiceResponse = BasicActionResponse & {
     statusPath: string,
     time: number,
 }
+
+export type PowerStatusResponse = {
+    id: string,
+    status: string,
+    error?: string,
+}
+
+export type ServiceInspectResponse = {
+    id: string,
+    template: {
+        id: string,
+        name: string,
+        description: string,
+        settings: Map<string, any>,
+    },
+    port: number,
+    options: Map<string, any>,
+    env: Map<string, string>,
+    session?: {
+        serviceId: string,
+        nodeId: string,
+        containerId: string,
+    }
+}
