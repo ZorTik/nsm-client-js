@@ -10,7 +10,7 @@ export class Service {
 
     async exists(): Promise<boolean> {
         return new Promise((resolve) => {
-            this.client.req("/v1/service/" + this.id)
+            this.client.req("/v1/service/" + this.id, this.id)
                 .then((res) => {
                     if (!res.id) {
                         throw new Error();
@@ -22,25 +22,25 @@ export class Service {
     }
 
     async resume(): Promise<BasicActionResponse> {
-        return this.client.req("/v1/service/" + this.id + "/resume", {
+        return this.client.req("/v1/service/" + this.id + "/resume", this.id, {
             method: "POST",
         });
     }
 
     async stop(): Promise<BasicActionResponse> {
-        return this.client.req("/v1/service/" + this.id + "/stop", {
+        return this.client.req("/v1/service/" + this.id + "/stop", this.id, {
             method: "POST",
         });
     }
 
     async delete(): Promise<BasicActionResponse> {
-        return this.client.req("/v1/service/" + this.id + "/delete", {
+        return this.client.req("/v1/service/" + this.id + "/delete", this.id, {
             method: "POST",
         });
     }
 
     async reboot(): Promise<BasicActionResponse> {
-        return this.client.req("/v1/service/" + this.id + "/reboot", {
+        return this.client.req("/v1/service/" + this.id + "/reboot", this.id, {
             method: "POST",
         });
     }

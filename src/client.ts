@@ -6,7 +6,7 @@ export default abstract class NSMAbstractClient {
     public abstract getBaseUrl(serviceId?: string): Promise<string>;
 
     async createService(body: CreateServiceRequest): Promise<CreateServiceResponse> {
-        return await this.req("/v1/service/create", {
+        return await this.req("/v1/service/create", undefined, {
             method: "POST",
             body: JSON.stringify(body),
         });
@@ -16,8 +16,8 @@ export default abstract class NSMAbstractClient {
         return new Service(this, id);
     }
 
-    async req(path: string, init?: RequestInit): Promise<any> {
-        const baseUrl = await this.getBaseUrl();
+    async req(path: string, serviceId?: string, init?: RequestInit): Promise<any> {
+        const baseUrl = await this.getBaseUrl(serviceId);
         return fetch(baseUrl + path, {
             ...init,
             headers: {
