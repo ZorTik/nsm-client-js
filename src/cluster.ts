@@ -25,7 +25,9 @@ export default class NSMCluster {
     }
 
     async nodeByService(id: string): Promise<string> {
-        await this.beforeAction();
+        await this.prepareSql();
+        await this.mapNodes();
+
         return this.firstBaseOrGet(() => new Promise((resolve, reject) => {
             this.db.query(
                 `SELECT nodeId FROM ${serviceTableName} WHERE serviceId = '${id}' LIMIT 1;`,
@@ -44,7 +46,9 @@ export default class NSMCluster {
     }
 
     async nodeBalanced(): Promise<string> {
-        await this.beforeAction();
+        await this.prepareSql();
+        await this.mapNodes();
+
         return this.firstBaseOrGet(() => new Promise((resolve, reject) => {
             this.db.query(
                 `SELECT nodeId, COUNT(serviceId) AS serviceCount FROM ${sessionTableName} GROUP BY nodeId;`,
@@ -88,11 +92,6 @@ export default class NSMCluster {
             }
             return get();
         }
-    }
-
-    private async beforeAction() {
-        await this.prepareSql();
-        await this.mapNodes();
     }
 
     private async prepareSql() {

@@ -10,6 +10,14 @@ export class NSMNode extends NSMAbstractClient {
         super();
     }
 
+    id() {
+        return this.nodeId;
+    }
+
+    /**
+     * Updates cached parameters.
+     * @returns {Promise<boolean>} True if the node was successfully fetched.
+     */
     async update(): Promise<boolean> {
         this.requireExists();
         const status = await this.status();
@@ -32,10 +40,6 @@ export class NSMNode extends NSMAbstractClient {
 
     async getBaseUrl(serviceId?: string): Promise<string> {
         return this.baseUrl;
-    }
-
-    id() {
-        return this.nodeId;
     }
 
     private requireExists() {
