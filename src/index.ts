@@ -9,6 +9,12 @@ export type NSMInitOptions = {
     dbString?: string,
 }
 
+export class NSMError extends Error {
+    constructor(public readonly status: number, message: string) {
+        super(message);
+    }
+}
+
 export function createNsm(options: NSMInitOptions) {
     return new NSM(options);
 }

@@ -1,5 +1,6 @@
 import {CreateServiceRequest, CreateServiceResponse} from "./models";
 import {Service} from "./service";
+import {NSMError} from "./index";
 
 export default abstract class NSMAbstractClient {
 
@@ -51,9 +52,9 @@ export default abstract class NSMAbstractClient {
                 return res.json();
             } else if (res.body) {
                 const body = await res.json();
-                throw new Error("NSM request failed with status code " + res.status + ": " + body.message);
+                throw new NSMError(res.status ?? 500, "NSM request failed with status code " + res.status + ": " + body.message);
             } else {
-                throw new Error("NSM request failed with status code " + res.status);
+                throw new NSMError(res.status ?? 500, "NSM request failed with status code " + res.status);
             }
         });
     }

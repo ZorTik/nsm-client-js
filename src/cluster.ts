@@ -28,48 +28,52 @@ export default class NSMCluster {
         await this.prepareSql();
         await this.mapNodes();
 
-        return this.firstBaseOrGet(() => new Promise((resolve, reject) => {
-            this.db.query(
-                `SELECT nodeId FROM ${serviceTableName} WHERE serviceId = '${id}' LIMIT 1;`,
-                (err, res) => {
-                    if (err || res.length === 0) {
-                        reject(err);
-                    } else {
-                        if (!Object.keys(this.nodes).includes(res[0].nodeId)) {
-                            reject(new Error("Node not found!"));
-                            return;
+        return this.firstBaseOrGet(
+            () => new Promise((resolve, reject) => {
+                this.db.query(
+                    `SELECT nodeId FROM ${serviceTableName} WHERE serviceId = '${id}' LIMIT 1;`,
+                    (err, res) => {
+                        if (err || res.length === 0) {
+                            reject(err);
+                        } else {
+                            if (!Object.keys(this.nodes).includes(res[0].nodeId)) {
+                                reject(new Error("Node not found!"));
+                                return;
+                            }
+                            resolve(this.nodes[res[0].nodeId].baseUrl);
                         }
-                        resolve(this.nodes[res[0].nodeId].baseUrl);
-                    }
-            });
-        }));
+                    });
+            })
+        );
     }
 
     async nodeBalanced(): Promise<string> {
         await this.prepareSql();
         await this.mapNodes();
 
-        return this.firstBaseOrGet(() => new Promise((resolve, reject) => {
-            this.db.query(
-                `SELECT nodeId, COUNT(serviceId) AS serviceCount FROM ${sessionTableName} GROUP BY nodeId;`,
-                (err, res: { nodeId: string, serviceCount: number }[]) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        const node = res
-                            .filter((node) => Object.keys(this.nodes).includes(node.nodeId))
-                            .sort((a, b) => a.serviceCount - b.serviceCount)
-                            .shift();
-                        if (node) {
-                            resolve(this.nodes[node.nodeId].baseUrl);
+        return this.firstBaseOrGet(
+            () => new Promise((resolve, reject) => {
+                this.db.query(
+                    `SELECT nodeId, COUNT(serviceId) AS serviceCount FROM ${sessionTableName} GROUP BY nodeId;`,
+                    (err, res: { nodeId: string, serviceCount: number }[]) => {
+                        if (err) {
+                            reject(err);
                         } else {
-                            // Random node
-                            const keys = Object.keys(this.nodes);
-                            resolve(this.nodes[keys[Math.floor(Math.random() * keys.length)]].baseUrl);
+                            const node = res
+                                .filter((node) => Object.keys(this.nodes).includes(node.nodeId))
+                                .sort((a, b) => a.serviceCount - b.serviceCount)
+                                .shift();
+                            if (node) {
+                                resolve(this.nodes[node.nodeId].baseUrl);
+                            } else {
+                                // Random node
+                                const keys = Object.keys(this.nodes);
+                                resolve(this.nodes[keys[Math.floor(Math.random() * keys.length)]].baseUrl);
+                            }
                         }
-                    }
-                });
-        }));
+                    });
+            }
+        ));
     }
 
     getNode(id: string): NSMNode {
